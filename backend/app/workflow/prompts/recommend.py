@@ -1,4 +1,4 @@
-from app.workflow.prompts.base import PERSONA
+from app.workflow.prompts.base import PERSONA, PII_RULES
 
 TASK = (
     "Using the conversation and the retrieved internal knowledge, produce practical guidance "
@@ -14,6 +14,7 @@ RULES = [
     ),
     "Keep the draft reply short: two or three sentences, conversational, no bullet lists.",
     "missing_info may list everything still outstanding, ordered by priority.",
+    *PII_RULES,
 ]
 
 
