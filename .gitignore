@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# Node
+node_modules/
+dist/
+
+# Env / secrets
+.env
+*.tfvars
+!terraform/terraform.tfvars.example
+
+# Terraform (lock files are committed for reproducible provider versions)
+.terraform/
+*.tfstate
+*.tfstate.*
+
+# generated at app startup
+graph_design.png
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
