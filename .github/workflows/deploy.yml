@@ -1,0 +1,78 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION }}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [frontend, backend]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+      - id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+      - name: Build and push image
+        env:
+          IMAGE: ${{ steps.ecr.outputs.registry }}/agent-workflow/${{ matrix.service }}
+        run: |
+          docker build -t "$IMAGE:${{ github.sha }}" -t "$IMAGE:latest" ${{ matrix.service }}
+          docker push --all-tags "$IMAGE"
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+      - uses: hashicorp/setup-terraform@v3
+      - name: Terraform init
+        working-directory: terraform
+        run: |
+          terraform init -input=false \
+            -backend-config="bucket=${{ secrets.TF_STATE_BUCKET }}" \
+            -backend-config="key=agent-workflow/terraform.tfstate" \
+            -backend-config="region=${{ vars.AWS_REGION }}"
+      - name: Terraform apply (infra + new task definitions)
+        working-directory: terraform
+        run: |
+          terraform apply -auto-approve -input=false \
+            -var "aws_region=${{ vars.AWS_REGION }}" \
+            -var "frontend_image_tag=${{ github.sha }}" \
+            -var "backend_image_tag=${{ github.sha }}"
+      - name: Wait for services to stabilize
+        run: |
+          aws ecs wait services-stable \
+            --cluster agent-workflow \
+            --services agent-workflow-frontend agent-workflow-backend
+      - name: Show application URL
+        run: |
+          TASK=$(aws ecs list-tasks --cluster agent-workflow \
+            --service-name agent-workflow-frontend --query 'taskArns[0]' --output text)
+          ENI=$(aws ecs describe-tasks --cluster agent-workflow --tasks "$TASK" \
+            --query 'tasks[0].attachments[0].details[?name==`networkInterfaceId`].value' --output text)
+          IP=$(aws ec2 describe-network-interfaces --network-interface-ids "$ENI" \
+            --query 'NetworkInterfaces[0].Association.PublicIp' --output text)
+          echo "Support console: http://$IP:8080"
