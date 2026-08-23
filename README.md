@@ -16,11 +16,11 @@ The agent console shows the conversation and the sidebar. The button "Open custo
 ## Repository
 
 ```
-backend/    FastAPI and LangGraph service: API, WebSocket, workflow, knowledge documents
-frontend/   React application. nginx supplies it and sends the API requests to the backend
-terraform/  AWS infrastructure: VPC, ECS, ECR, IAM, logs, secrets, and a bootstrap stack
-docs/       Design documents and the related compromises
-.github/    The CI workflow and the deploy workflow
+backend/    FastAPI and LangGraph service
+frontend/   
+terraform/  AWS infrastructure
+docs/       Documentations related to code
+.github/    CI actions
 ```
 
 ## Local operation
