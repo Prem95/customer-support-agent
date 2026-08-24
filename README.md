@@ -19,7 +19,7 @@ The agent console shows the conversation and the sidebar. The button "Open custo
 backend/    FastAPI and LangGraph service
 frontend/   
 terraform/  AWS infrastructure
-docs/       Documentations related to code
+docs/       design.md: architecture, workflow design, security, and operations
 .github/    CI actions
 ```
 
