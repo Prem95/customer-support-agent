@@ -101,11 +101,10 @@ The apply releases the infrastructure and the application together, so Terraform
 
 First installation:
 
-1. `terraform apply` in `terraform/bootstrap` makes the state bucket and the CI role.
+1. `terraform apply` in `terraform/bootstrap` makes the state bucket, the CI role, and the ECR repositories. The repositories live here because images must exist before the root stack can create the services that use them.
 2. In GitHub, set the secrets `AWS_DEPLOY_ROLE_ARN` and `TF_STATE_BUCKET`, the variable `AWS_REGION`, and the `production` environment.
-3. `terraform apply` in `terraform/` makes the ECR repositories. This must come before any image push.
-4. Put the API key in Secrets Manager with `aws secretsmanager put-secret-value`.
-5. Push to `main`. The pipeline does the rest.
+3. Put the API key in Secrets Manager with `aws secretsmanager put-secret-value`.
+4. Push to `main`. The pipeline builds the images, pushes them, and applies the root stack.
 
 Run the `application_url_command` output to get the console address. `terraform destroy` removes everything.
 

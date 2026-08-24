@@ -12,12 +12,12 @@ output "application_url_command" {
 
 output "ecr_frontend_repository_url" {
   description = "ECR repository for frontend images"
-  value       = aws_ecr_repository.frontend.repository_url
+  value       = data.aws_ecr_repository.frontend.repository_url
 }
 
 output "ecr_backend_repository_url" {
   description = "ECR repository for backend images"
-  value       = aws_ecr_repository.backend.repository_url
+  value       = data.aws_ecr_repository.backend.repository_url
 }
 
 output "ecs_cluster_name" {

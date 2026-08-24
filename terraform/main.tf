@@ -1,9 +1,6 @@
-data "aws_caller_identity" "current" {}
-
 locals {
-  ecr_registry   = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.aws_region}.amazonaws.com"
-  frontend_image = "${aws_ecr_repository.frontend.repository_url}:${var.frontend_image_tag}"
-  backend_image  = "${aws_ecr_repository.backend.repository_url}:${var.backend_image_tag}"
+  frontend_image = "${data.aws_ecr_repository.frontend.repository_url}:${var.frontend_image_tag}"
+  backend_image  = "${data.aws_ecr_repository.backend.repository_url}:${var.backend_image_tag}"
   backend_port   = 8000
   frontend_port  = 8080
 }
