@@ -1,14 +1,7 @@
 import { useRef, useState } from "react";
 import { addKnowledge } from "../api";
+import { WorkflowSteps } from "./WorkflowSteps";
 import type { ConversationSummary, SidebarUpdate } from "../types";
-
-const STAGE_LABELS: Record<string, string> = {
-  analyze_intent: "Analyzing intent",
-  retrieve_knowledge: "Searching knowledge",
-  generate_recommendations: "Drafting recommendations",
-  update_summary: "Updating summary",
-  handle_failure: "Recovering",
-};
 
 interface Props {
   conversations: ConversationSummary[];
@@ -16,7 +9,8 @@ interface Props {
   onSelect: (id: string) => void;
   onDelete: (id: string) => void;
   sidebar: SidebarUpdate;
-  activeStage: string | null;
+  doneStages: string[];
+  running: boolean;
   error: string | null;
   onSendSuggestion: () => void;
   suggestionSent: boolean;
@@ -28,7 +22,8 @@ export function Sidebar({
   onSelect,
   onDelete,
   sidebar,
-  activeStage,
+  doneStages,
+  running,
   error,
   onSendSuggestion,
   suggestionSent,
@@ -76,10 +71,11 @@ export function Sidebar({
 
       <header className="panel-header">
         <h2>Assistant</h2>
-        {activeStage && <span className="stage">{STAGE_LABELS[activeStage] ?? activeStage}…</span>}
+        {running && <span className="stage">working</span>}
       </header>
 
       <div className="sections">
+        <WorkflowSteps doneStages={doneStages} running={running} />
         {error && <p className="notice">{error}</p>}
         {sidebar.degraded && <p className="notice">Degraded, showing partial assistance.</p>}
 

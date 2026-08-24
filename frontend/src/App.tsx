@@ -24,8 +24,17 @@ interface AgentViewProps {
 }
 
 function AgentView({ conversationId, conversations, onSelect, onDelete }: AgentViewProps) {
-  const { connected, messages, sidebar, activeStage, error, typingRole, sendMessage, sendTyping } =
-    useConversation(conversationId);
+  const {
+    connected,
+    messages,
+    sidebar,
+    doneStages,
+    running,
+    error,
+    typingRole,
+    sendMessage,
+    sendTyping,
+  } = useConversation(conversationId);
   const [sentSuggestion, setSentSuggestion] = useState<string | null>(null);
 
   return (
@@ -36,7 +45,8 @@ function AgentView({ conversationId, conversations, onSelect, onDelete }: AgentV
         onSelect={onSelect}
         onDelete={onDelete}
         sidebar={sidebar}
-        activeStage={activeStage}
+        doneStages={doneStages}
+        running={running}
         error={error}
         suggestionSent={sentSuggestion === sidebar.suggested_response}
         onSendSuggestion={() => {

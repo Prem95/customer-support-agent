@@ -8,6 +8,8 @@ export interface ConversationState {
   messages: ChatMessage[];
   sidebar: SidebarUpdate;
   activeStage: string | null;
+  doneStages: string[];
+  running: boolean;
   error: string | null;
   typingRole: Role | null;
   sendMessage: (role: Role, content: string) => void;
@@ -22,6 +24,8 @@ export function useConversation(conversationId: string): ConversationState {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [sidebar, setSidebar] = useState<SidebarUpdate>(EMPTY_SIDEBAR);
   const [activeStage, setActiveStage] = useState<string | null>(null);
+  const [doneStages, setDoneStages] = useState<string[]>([]);
+  const [running, setRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [typingRole, setTypingRole] = useState<Role | null>(null);
   const socketRef = useRef<WebSocket | null>(null);
@@ -57,6 +61,10 @@ export function useConversation(conversationId: string): ConversationState {
           case "message":
             setMessages((prev) => [...prev, event.message]);
             setTypingRole((prev) => (prev === event.message.role ? null : prev));
+            if (event.message.role === "customer") {
+              setDoneStages([]);
+              setRunning(true);
+            }
             break;
           case "typing":
             setTypingRole(event.role);
@@ -65,15 +73,18 @@ export function useConversation(conversationId: string): ConversationState {
             break;
           case "workflow_stage":
             setActiveStage(event.stage);
+            setDoneStages((prev) => (prev.includes(event.stage) ? prev : [...prev, event.stage]));
             setError(null);
             break;
           case "workflow_update":
             setSidebar(event.sidebar);
             setActiveStage(null);
+            setRunning(false);
             break;
           case "error":
             setError(event.detail);
             setActiveStage(null);
+            setRunning(false);
             break;
         }
       };
@@ -104,5 +115,16 @@ export function useConversation(conversationId: string): ConversationState {
     socket.send(JSON.stringify({ type: "typing", role }));
   }, []);
 
-  return { connected, messages, sidebar, activeStage, error, typingRole, sendMessage, sendTyping };
+  return {
+    connected,
+    messages,
+    sidebar,
+    activeStage,
+    doneStages,
+    running,
+    error,
+    typingRole,
+    sendMessage,
+    sendTyping,
+  };
 }
