@@ -19,6 +19,7 @@ env:
 
 jobs:
   build-and-push:
+    if: vars.AWS_REGION != ''
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -39,6 +40,7 @@ jobs:
           docker push --all-tags "$IMAGE"
 
   deploy:
+    if: vars.AWS_REGION != ''
     needs: build-and-push
     runs-on: ubuntu-latest
     environment: production
