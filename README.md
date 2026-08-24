@@ -29,20 +29,37 @@ You need an [OpenRouter](https://openrouter.ai) API key.
 
 ```bash
 cp backend/.env.example backend/.env   # put your OPENROUTER_API_KEY in this file
-docker compose up --build
-# open http://localhost:3000
+make dev                               # open http://localhost:3000
 ```
 
-Without Docker, use two terminals:
+Common commands:
 
-```bash
-cd backend && uv sync && uv run uvicorn app.main:app --reload   # port 8000
-cd frontend && npm install && npm run dev                        # port 5173
+| Command | Action |
+|---|---|
+| `make dev` | build and run both containers on :3000 |
+
+## Infrastructure
+
+Two ECS Fargate services in one VPC
+
+```
+terraform/bootstrap/   S3 state bucket, GitHub role, ECR repositories
+terraform/             VPC, ECS, IAM, logs, secrets (applied by CI)
 ```
 
-Tests and lint checks:
+### First deployment
 
 ```bash
-cd backend && uv run pytest && uv run ruff check .
-cd frontend && npm run lint && npm run build
+# 1. one-time bootstrap, with local state
+cd terraform/bootstrap
+terraform init && terraform apply -var github_repository=<owner>/<repo>
+
+# 2. in GitHub, add the secrets AWS_DEPLOY_ROLE_ARN and TF_STATE_BUCKET,
+#    the variable AWS_REGION, and a "production" environment
+
+# 3. store the API key
+aws secretsmanager put-secret-value \
+  --secret-id agent-workflow/openrouter-api-key --secret-string '<OPENROUTER_API_KEY>'
+
+# 4. push to main
 ```
