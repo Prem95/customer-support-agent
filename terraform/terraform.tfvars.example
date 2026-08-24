@@ -1,0 +1,9 @@
+project    = "agent-workflow"
+aws_region = "ap-southeast-1"
+
+# Lock the ALB down to office/VPN ranges for a real internal tool.
+allowed_ingress_cidrs = ["0.0.0.0/0"]
+
+frontend_image_tag = "latest"
+backend_image_tag  = "latest"
+llm_model          = "google/gemini-3.7-flash"
