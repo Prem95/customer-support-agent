@@ -1,6 +1,5 @@
 import logging
 from contextlib import asynccontextmanager
-from pathlib import Path
 
 from fastapi import FastAPI
 
@@ -25,15 +24,6 @@ async def lifespan(app: FastAPI):
     retriever = KnowledgeRetriever()
     llm = LLMClient(settings)
     graph = build_graph(WorkflowNodes(llm, retriever, settings))
-
-    # for arch design
-    try:
-        export_graph = graph.get_graph().draw_mermaid_png()
-        Path("graph_design.png").write_bytes(export_graph)
-    except Exception:
-        # rendering calls mermaid.ink, so never let it stop startup
-        logging.getLogger(__name__).warning("graph diagram export failed", exc_info=True)
-
     connections = ConnectionManager()
 
     app.state.retriever = retriever
