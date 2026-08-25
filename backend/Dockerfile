@@ -1,4 +1,3 @@
-# --- build stage: resolve dependencies with uv ---
 FROM python:3.12-slim AS builder
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 WORKDIR /app
@@ -7,7 +6,6 @@ COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-dev --no-install-project
 COPY app ./app
 
-# --- runtime stage: slim image, non-root user ---
 FROM python:3.12-slim
 RUN groupadd -r appuser && useradd -r -g appuser appuser
 WORKDIR /app

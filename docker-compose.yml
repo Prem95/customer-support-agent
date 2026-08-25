@@ -1,7 +1,9 @@
 services:
   backend:
     build: ./backend
-    env_file: ./backend/.env
+    env_file:
+      - path: ./backend/.env
+        required: false
     environment:
       ENVIRONMENT: local
     ports:

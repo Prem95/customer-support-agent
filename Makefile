@@ -1,12 +1,15 @@
 .PHONY: dev build up down logs test lint format tf-validate tf-plan clean
 
-dev:
+backend/.env:
+	cp backend/.env.example backend/.env
+
+dev: backend/.env
 	docker compose up
 
 build:
 	docker compose build
 
-up:
+up: backend/.env
 	docker compose up -d
 
 down:
@@ -18,7 +21,10 @@ logs:
 test:
 	cd backend && uv run pytest -q
 
-lint:
+frontend/node_modules:
+	cd frontend && npm ci
+
+lint: frontend/node_modules
 	cd backend && uv run ruff check .
 	cd frontend && npm run lint
 	cd terraform && terraform fmt -check -recursive
@@ -28,8 +34,8 @@ format:
 	cd terraform && terraform fmt -recursive
 
 tf-validate:
-	cd terraform && terraform validate
-	cd terraform/bootstrap && terraform validate
+	cd terraform && terraform init -backend=false -input=false >/dev/null && terraform validate
+	cd terraform/bootstrap && terraform init -backend=false -input=false >/dev/null && terraform validate
 
 tf-plan:
 	cd terraform && terraform plan
