@@ -57,7 +57,9 @@ Security group chain: `allowed_ingress_cidrs -> frontend-sg:8080 -> backend-sg:8
 ## Observability
 
 - Persist logs in AWS Cloudwatch under these namespace - `/ecs/agent-workflow/frontend` and `/ecs/agent-workflow/backend`
-- Each run logs its start and end with the `conversation_id` and a short `run_id`. A node failure logs a traceback
+- Each run logs its start and end with the `conversation_id` and a short `run_id`. A node failure logs a traceback that can be analysed on CloudWatch namespace
+- Both the Frontend and Backend logs can be inspected from the running container itself - No need for external logging services
+- 
 
 ---
 
@@ -99,10 +101,11 @@ Each node is checkpointed in the memory and can be accessed by the thread_id
 
 - **Network.** The backend service has no public IP and no internet route. Only the frontend security group reaches port 8000. 
 - **IAM.** Each service has its own execution role. Only the backend service is able to read the secrets from the Secrets Manager
-- **Secrets.** The API keys are managed here
+- **Secrets.** The API keys are managed in Secrets Manager and set in terraform state during the build
+- **Documents** The knowledge base documents are stored in the container image. This is developed such for this interview assessment and simplicity sake
+- **Logging** Logs are routes to each CloudWatch group for each service
 
 ---
-
 
 
 # 4. CI/CD and operations
