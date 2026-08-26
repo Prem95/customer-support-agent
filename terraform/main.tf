@@ -65,7 +65,7 @@ module "backend_service" {
   }
 
   secrets = {
-    OPENROUTER_API_KEY = aws_secretsmanager_secret.openrouter_api_key.arn
+    OPENROUTER_API_KEY = data.aws_secretsmanager_secret.openrouter_api_key.arn
   }
 
   health_check_command = [

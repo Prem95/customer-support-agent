@@ -101,7 +101,7 @@ Each node is checkpointed in the memory and can be accessed by the thread_id
 
 - **Network.** The backend service has no public IP and no internet route. Only the frontend security group reaches port 8000. 
 - **IAM.** Each service has its own execution role. Only the backend service is able to read the secrets from the Secrets Manager
-- **Secrets.** The API keys are managed in Secrets Manager and set in terraform state during the build
+- **Secrets.** The API keys are held in Secrets Manager. The entry is created in the bootstrap config and its value is set out-of-band with `put-secret-value`, so it never enters terraform state or VCS. The backend task reads it at start
 - **Documents** The knowledge base documents are stored in the container image. This is developed such for this interview assessment and simplicity sake
 - **Logging** Logs are routes to each CloudWatch group for each service
 
@@ -119,7 +119,7 @@ Each node is checkpointed in the memory and can be accessed by the thread_id
 
 First installation:
 
-1. `terraform apply` in `terraform/bootstrap` makes the bucket, the CI role, and the ECR repositories
+1. `terraform apply` in `terraform/bootstrap` makes the bucket, the CI role, the ECR repositories, and the empty API key secret
 2. In GitHub, set the secrets `AWS_DEPLOY_ROLE_ARN` and `TF_STATE_BUCKET`, the variable `AWS_REGION`, and the `production` environment.
 3. Put the API key in Secrets Manager with `aws secretsmanager put-secret-value`.
 4. Push to `main`. The pipeline builds the images, pushes them, and applies the root stack.

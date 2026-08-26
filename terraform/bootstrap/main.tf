@@ -149,3 +149,12 @@ output "ecr_frontend_repository_url" {
 output "ecr_backend_repository_url" {
   value = aws_ecr_repository.backend.repository_url
 }
+
+resource "aws_secretsmanager_secret" "openrouter_api_key" {
+  name        = "${var.project}/openrouter-api-key"
+  description = "OpenRouter API key used by the backend LLM client"
+}
+
+output "openrouter_secret_id" {
+  value = aws_secretsmanager_secret.openrouter_api_key.name
+}

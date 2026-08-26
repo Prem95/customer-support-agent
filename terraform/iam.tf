@@ -33,7 +33,7 @@ resource "aws_iam_role_policy_attachment" "backend_execution" {
 data "aws_iam_policy_document" "backend_secrets" {
   statement {
     actions   = ["secretsmanager:GetSecretValue"]
-    resources = [aws_secretsmanager_secret.openrouter_api_key.arn]
+    resources = [data.aws_secretsmanager_secret.openrouter_api_key.arn]
   }
 }
 

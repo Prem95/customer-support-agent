@@ -117,7 +117,7 @@ export default function App() {
     return (
       <div className="app">
         <header className="app-header">
-          <h1>Support Chat</h1>
+          <h1>Copilot Chat</h1>
         </header>
         <CustomerView key={conversationId} conversationId={conversationId} />
       </div>
@@ -127,7 +127,7 @@ export default function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>Support Console</h1>
+        <h1>Copilot Console</h1>
         <div className="header-right">
           <button className="btn-ghost" onClick={openCustomerView}>
             Open customer chat

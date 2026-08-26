@@ -27,5 +27,5 @@ output "ecs_cluster_name" {
 
 output "openrouter_secret_arn" {
   description = "Secrets Manager ARN to populate with the OpenRouter API key"
-  value       = aws_secretsmanager_secret.openrouter_api_key.arn
+  value       = data.aws_secretsmanager_secret.openrouter_api_key.arn
 }
